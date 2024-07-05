@@ -1,0 +1,18 @@
+{
+  "name": "insurance-smart-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for automated claims processing and customizable insurance coverage.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "ganache": "^7.9.2",
+    "ganache-cli": "^6.12.2",
+    "truffle": "^5.11.5"
+  }
+}
