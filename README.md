@@ -15,6 +15,18 @@ These features will leverage Ethereum smart contracts to provide efficiency, red
 - **.env**: Environment variables.
 - **truffle-config.js**: Truffle configuration file.
 
+## Smart Contracts
+This project includes the following smart contracts:
+
+- **CoreContract:** Manages user registrations and authentication.
+- **ClaimsProcessing:** Handles the submission, processing, and settlement of insurance claims.
+- **DataStorage:** Provides a storage mechanism for arbitrary data.
+- **CustomizableCoverage:** Allows users to create and manage custom insurance policies.
+- **Compliance:** Implements compliance checks such as GDPR compliance and transaction audits.
+- **Utility:** Contains utility functions for data validation, premium calculation, and external data integration.
+- **ExternalDataIntegration:** Handles data requests and responses from external oracles.
+
+
 ## Development Environment Setup
 
 ### Prerequisites
