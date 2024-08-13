@@ -3,8 +3,13 @@
 }
 
 .App-logo {
-  height: 40vmin;
+  width: 172.5px;
+  /* Adjusting based on half the original dimensions to fit better */
+  height: 211px;
+  /* Adjusting based on half the original dimensions to fit better */
   pointer-events: none;
+  margin-bottom: 20px;
+  /* Optional: Adds some space between the logo and the content below */
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -32,6 +37,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

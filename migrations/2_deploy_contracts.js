@@ -6,20 +6,31 @@ const Compliance = artifacts.require("Compliance");
 const Utility = artifacts.require("Utility");
 const ExternalDataIntegration = artifacts.require("ExternalDataIntegration");
 
-module.exports = function (deployer) {
-    deployer.deploy(CoreContract).then(function () {
-        return deployer.deploy(ClaimsProcessing, CoreContract.address);
-    }).then(function () {
-        return deployer.deploy(DataStorage);
-    }).then(function () {
-        return deployer.deploy(CustomizableCoverage, CoreContract.address);
-    }).then(function () {
-        return deployer.deploy(Compliance, CoreContract.address);
-    }).then(function () {
-        return deployer.deploy(Utility);
-    }).then(function () {
-        // Placeholder oracle address for development purposes 
-        const placeholderOracleAddress = '0x0000000000000000000000000000000000000000';
-        return deployer.deploy(ExternalDataIntegration, placeholderOracleAddress);
-    });
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+module.exports = async function (deployer) {
+    await deployer.deploy(CoreContract);
+    await sleep(1000); // Wait 1 second between requests
+
+    await deployer.deploy(ClaimsProcessing, CoreContract.address);
+    await sleep(1000); // Wait 1 second between requests
+
+    await deployer.deploy(DataStorage);
+    await sleep(1000); // Wait 1 second between requests
+
+    await deployer.deploy(CustomizableCoverage, CoreContract.address);
+    await sleep(1000); // Wait 1 second between requests
+
+    await deployer.deploy(Compliance, CoreContract.address);
+    await sleep(1000); // Wait 1 second between requests
+
+    await deployer.deploy(Utility);
+    await sleep(1000); // Wait 1 second between requests
+
+    // Placeholder oracle address for development purposes 
+    const placeholderOracleAddress = '0x0000000000000000000000000000000000000000';
+    await deployer.deploy(ExternalDataIntegration, placeholderOracleAddress);
 };
+

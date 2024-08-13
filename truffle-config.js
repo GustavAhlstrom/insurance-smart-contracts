@@ -1,6 +1,10 @@
 require('dotenv').config();
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
+// Log the environment variables to ensure they're loaded correctly
+console.log("Mnemonic:", process.env.MNEMONIC);
+console.log("Infura API Key:", process.env.INFURA_API_KEY);
+
 module.exports = {
   networks: {
     development: {
@@ -31,4 +35,5 @@ module.exports = {
     }
   }
 };
+
 
