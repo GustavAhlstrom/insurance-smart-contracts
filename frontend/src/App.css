@@ -3,19 +3,10 @@
 }
 
 .App-logo {
-  width: 172.5px;
-  /* Adjusting based on half the original dimensions to fit better */
-  height: 211px;
-  /* Adjusting based on half the original dimensions to fit better */
+  width: 215px;
+  height: 215px;
   pointer-events: none;
-  margin-bottom: 20px;
-  /* Optional: Adds some space between the logo and the content below */
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  margin-bottom: -2.5em;
 }
 
 .App-header {
@@ -29,16 +20,16 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+h1 {
+  font-size: 2.5em;
+  margin-bottom: -0.1em;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+h2 {
+  font-size: 0.5em;
+  margin-top: 0;
+}
 
-  to {
-    transform: rotate(360deg);
-  }
+.App-link {
+  color: #61dafb;
 }

@@ -10,27 +10,37 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function deployWithRetry(deployer, contract, args = [], retries = 3, delay = 1000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            await deployer.deploy(contract, ...args);
+            break;
+        } catch (error) {
+            console.error(`Deployment failed: ${error.message}. Retrying... (${i + 1}/${retries})`);
+            await sleep(delay);
+        }
+    }
+}
+
 module.exports = async function (deployer) {
-    await deployer.deploy(CoreContract);
-    await sleep(1000); // Wait 1 second between requests
+    await deployWithRetry(deployer, CoreContract);
+    await sleep(8000);
 
-    await deployer.deploy(ClaimsProcessing, CoreContract.address);
-    await sleep(1000); // Wait 1 second between requests
+    await deployWithRetry(deployer, ClaimsProcessing, [CoreContract.address]);
+    await sleep(8000);
 
-    await deployer.deploy(DataStorage);
-    await sleep(1000); // Wait 1 second between requests
+    await deployWithRetry(deployer, DataStorage);
+    await sleep(8000);
 
-    await deployer.deploy(CustomizableCoverage, CoreContract.address);
-    await sleep(1000); // Wait 1 second between requests
+    await deployWithRetry(deployer, CustomizableCoverage, [CoreContract.address]);
+    await sleep(8000);
 
-    await deployer.deploy(Compliance, CoreContract.address);
-    await sleep(1000); // Wait 1 second between requests
+    await deployWithRetry(deployer, Compliance, [CoreContract.address]);
+    await sleep(8000);
 
-    await deployer.deploy(Utility);
-    await sleep(1000); // Wait 1 second between requests
+    await deployWithRetry(deployer, Utility);
+    await sleep(8000);
 
-    // Placeholder oracle address for development purposes 
     const placeholderOracleAddress = '0x0000000000000000000000000000000000000000';
-    await deployer.deploy(ExternalDataIntegration, placeholderOracleAddress);
+    await deployWithRetry(deployer, ExternalDataIntegration, [placeholderOracleAddress]);
 };
-

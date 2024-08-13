@@ -15,51 +15,77 @@ const App = () => {
   const [complianceContract, setComplianceContract] = useState(null);
   const [utilityContract, setUtilityContract] = useState(null);
   const [claimsProcessingContract, setClaimsProcessingContract] = useState(null);
-  const [coreContract, setCoreContract] = useState(null);
   const [customizableCoverageContract, setCustomizableCoverageContract] = useState(null);
   const [dataStorageContract, setDataStorageContract] = useState(null);
   const [externalDataIntegrationContract, setExternalDataIntegrationContract] = useState(null);
+  const [coreContract, setCoreContract] = useState(null);
   const [complianceData, setComplianceData] = useState('');
   const [premiumData, setPremiumData] = useState('');
   const [claimStatus, setClaimStatus] = useState('');
   const [coverageDetails, setCoverageDetails] = useState('');
+  const [premium, setPremium] = useState('');
 
-  useEffect(() => {
-    loadBlockchainData();
-  }, []);
+  let web3;
+
+  const loadContract = async (abi, contractStateSetter = null, networkId) => {
+    const deployedNetwork = abi.networks[networkId];
+    if (deployedNetwork) {
+      const contract = new web3.eth.Contract(abi.abi, deployedNetwork.address);
+      if (contractStateSetter) {
+        contractStateSetter(contract);
+      }
+      return contract;
+    } else {
+      alert(`${abi.contractName} contract not deployed to detected network.`);
+      return null;
+    }
+  };
 
   const loadBlockchainData = async () => {
     if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
-      await window.ethereum.enable();
+      web3 = new Web3(window.ethereum);
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+      } catch (error) {
+        console.error("User denied account access");
+      }
 
       const accounts = await web3.eth.getAccounts();
       setAccount(accounts[0]);
 
       const networkId = await web3.eth.net.getId();
 
-      const loadContract = async (abi, contractStateSetter) => {
-        const deployedNetwork = abi.networks[networkId];
-        if (deployedNetwork) {
-          const contract = new web3.eth.Contract(abi.abi, deployedNetwork.address);
-          contractStateSetter(contract);
-        } else {
-          alert(`${abi.contractName} contract not deployed to detected network.`);
-        }
-      };
+      const coreContract = await loadContract(CoreContractABI, setCoreContract, networkId);
 
-      // Load all contracts
-      await loadContract(ComplianceABI, setComplianceContract);
-      await loadContract(UtilityABI, setUtilityContract);
-      await loadContract(ClaimsProcessingABI, setClaimsProcessingContract);
-      await loadContract(CoreContractABI, setCoreContract);
-      await loadContract(CustomizableCoverageABI, setCustomizableCoverageContract);
-      await loadContract(DataStorageABI, setDataStorageContract);
-      await loadContract(ExternalDataIntegrationABI, setExternalDataIntegrationContract);
+      if (coreContract) {
+        const isRegistered = await coreContract.methods.authenticateUser(accounts[0]).call();
+        if (!isRegistered) {
+          try {
+            await coreContract.methods.registerUser(accounts[0]).send({ from: accounts[0] });
+          } catch (error) {
+            if (error.code === 4001) {
+              console.log('Transaction rejected by user.');
+            } else {
+              console.error('An error occurred:', error);
+            }
+          }
+        }
+      }
+
+      await loadContract(ComplianceABI, setComplianceContract, networkId);
+      await loadContract(UtilityABI, setUtilityContract, networkId);
+      await loadContract(ClaimsProcessingABI, setClaimsProcessingContract, networkId);
+      await loadContract(CustomizableCoverageABI, setCustomizableCoverageContract, networkId);
+      await loadContract(DataStorageABI, setDataStorageContract, networkId);
+      await loadContract(ExternalDataIntegrationABI, setExternalDataIntegrationContract, networkId);
     } else {
       alert('Please install MetaMask!');
     }
   };
+
+  useEffect(() => {
+    loadBlockchainData();
+  }, []);
 
   const checkCompliance = async () => {
     if (complianceContract) {
@@ -72,46 +98,100 @@ const App = () => {
 
   const calculatePremium = async () => {
     if (utilityContract) {
+      const coverageBytes32 = Web3.utils.asciiToHex(coverageDetails.padEnd(32));
       const result = await utilityContract.methods
-        .calculatePremium(web3.utils.asciiToHex("Coverage Details"))
+        .calculatePremium(coverageBytes32)
         .call({ from: account });
       setPremiumData(result);
     }
   };
 
   const processClaim = async () => {
-    if (claimsProcessingContract) {
-      const result = await claimsProcessingContract.methods
-        .processClaim(web3.utils.keccak256("Claim123"))
-        .call({ from: account });
-      setClaimStatus(result);
+    if (claimsProcessingContract && coreContract) {
+      const isRegistered = await coreContract.methods.authenticateUser(account).call();
+      if (!isRegistered) {
+        try {
+          await coreContract.methods.registerUser(account).send({ from: account });
+        } catch (error) {
+          if (error.code === 4001) {
+            console.log('Transaction rejected by user.');
+            return;
+          } else {
+            console.error('An error occurred:', error);
+            return;
+          }
+        }
+      }
+
+      try {
+        const result = await claimsProcessingContract.methods
+          .processClaim(Web3.utils.keccak256("Claim123"))
+          .call({ from: account });
+        setClaimStatus(result);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log('Transaction rejected by user.');
+        } else {
+          console.error('An error occurred:', error);
+        }
+      }
     }
   };
 
   const customizeCoverage = async () => {
     if (customizableCoverageContract) {
-      const result = await customizableCoverageContract.methods
-        .customizeCoverage(account, "High", 1000)
-        .send({ from: account });
-      console.log('Coverage customized:', result);
+      const coverageBytes32 = Web3.utils.asciiToHex(coverageDetails);
+      try {
+        const result = await customizableCoverageContract.methods
+          .customizeCoverage(account, coverageBytes32, premium)
+          .send({ from: account });
+        console.log('Coverage customized:', result);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log('Transaction rejected by user.');
+        } else {
+          console.error('An error occurred:', error);
+        }
+      }
     }
   };
 
   const storeData = async () => {
     if (dataStorageContract) {
-      const result = await dataStorageContract.methods
-        .storeData(web3.utils.asciiToHex("Important Data"))
-        .send({ from: account });
-      console.log('Data stored:', result);
+      const key = Web3.utils.asciiToHex("Important Data").slice(0, 66);
+      const paddedKey = Web3.utils.padRight(key, 64);
+      const value = Web3.utils.asciiToHex("Value to store");
+
+      try {
+        const result = await dataStorageContract.methods
+          .storeData(paddedKey, value)
+          .send({ from: account });
+
+        console.log('Data stored:', result);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log('Transaction rejected by user.');
+        } else {
+          console.error('An error occurred:', error);
+        }
+      }
     }
   };
 
   const integrateData = async () => {
     if (externalDataIntegrationContract) {
-      const result = await externalDataIntegrationContract.methods
-        .integrateData("0xOracleAddress")
-        .call({ from: account });
-      console.log('Data integrated:', result);
+      try {
+        const result = await externalDataIntegrationContract.methods
+          .integrateData("0xOracleAddress")
+          .call({ from: account });
+        console.log('Data integrated:', result);
+      } catch (error) {
+        if (error.code === 4001) {
+          console.log('Transaction rejected by user.');
+        } else {
+          console.error('An error occurred:', error);
+        }
+      }
     }
   };
 
@@ -119,8 +199,25 @@ const App = () => {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <h1>Insurance Smart Contract</h1>
+        <h1>Ensurify</h1>
+        <h2>'Insurance, the smart way'</h2>
         <p>Your Account: {account}</p>
+
+        <div>
+          <input
+            type="text"
+            placeholder="Enter Coverage Details"
+            value={coverageDetails}
+            onChange={(e) => setCoverageDetails(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Enter Premium Amount"
+            value={premium}
+            onChange={(e) => setPremium(e.target.value)}
+          />
+          <button onClick={customizeCoverage}>Customize Coverage</button>
+        </div>
 
         <button onClick={checkCompliance}>Check Compliance</button>
         {complianceData && <p>GDPR Compliance: {complianceData.toString()}</p>}
@@ -131,19 +228,29 @@ const App = () => {
         <button onClick={processClaim}>Process Claim</button>
         {claimStatus && <p>Claim Status: {claimStatus.toString()}</p>}
 
-        <button onClick={customizeCoverage}>Customize Coverage</button>
-
         <button onClick={storeData}>Store Data</button>
 
         <button onClick={integrateData}>Integrate External Data</button>
 
-        {/* Add more buttons and interactions as needed */}
       </header>
     </div>
   );
 };
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
