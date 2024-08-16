@@ -4,7 +4,11 @@
   "description": "Smart contracts for automated claims processing and customizable insurance coverage.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test:frontend": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "keywords": [],
   "author": "",
@@ -13,13 +17,40 @@
     "@openzeppelin/contracts": "^5.0.2",
     "ganache": "^7.9.2",
     "ganache-cli": "^6.12.2",
-    "truffle": "^5.11.5"
+    "truffle": "^5.11.5",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "dependencies": {
     "@truffle/hdwallet-provider": "^2.1.15",
     "dotenv": "^16.4.5",
     "ethereumjs-util": "^7.1.5",
     "ethers": "^6.13.2",
-    "web3": "^4.11.1"
+    "web3": "^4.11.1",
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "ipfs-http-client": "^60.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^4.2.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
