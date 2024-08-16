@@ -1,3 +1,5 @@
+/* Existing styles */
+
 .App {
   text-align: center;
 }
@@ -30,6 +32,28 @@ h2 {
   margin-top: 0;
 }
 
-.App-link {
-  color: #61dafb;
+/* New styles for input row */
+
+.input-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
+
+input,
+button {
+  padding: 0.5em;
+  margin: 0.5em;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+input {
+  width: 280px;
+  /* Ensure enough width for placeholder text */
+}
+
+button {
+  min-width: 220px
