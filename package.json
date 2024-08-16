@@ -1,7 +1,13 @@
 {
+<<<<<<< HEAD
   "name": "insurance-smart-contracts",
   "version": "1.0.0",
   "description": "Smart contracts for automated claims processing and customizable insurance coverage.",
+=======
+  "name": "multi-api-external-adapter",
+  "version": "1.0.0",
+  "description": "",
+>>>>>>> a0e13b7 (Initial commit for external adapter)
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,6 +19,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+<<<<<<< HEAD
   "devDependencies": {
     "@openzeppelin/contracts": "^5.0.2",
     "ganache": "^7.9.2",
@@ -25,6 +32,7 @@
     "dotenv": "^16.4.5",
     "ethereumjs-util": "^7.1.5",
     "ethers": "^6.13.2",
+<<<<<<< HEAD
     "web3": "^4.11.1",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "^16.0.0",
@@ -52,5 +60,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+=======
+    "web3": "^4.11.1"
+=======
+  "dependencies": {
+    "axios": "^1.7.4",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+>>>>>>> a0e13b7 (Initial commit for external adapter)
+>>>>>>> 9bd748c (Initial commit for external adapter)
   }
 }
